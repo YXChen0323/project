@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  llm-sql-app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: llm-sql-app
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./app/uploaded_files:/app/app/uploaded_files
+      - ./llm:/app/llm
+    deploy: {}
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
