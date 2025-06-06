@@ -1,10 +1,10 @@
 version: "3.9"
 services:
-  dqs-app:
+  nldqs-app:
     build:
       context: ./app
       dockerfile: Dockerfile.dqs
-    container_name: dqs_streamlit
+    container_name: nldqs_streamlit
     ports:
       - "8501:8501"
     volumes:
