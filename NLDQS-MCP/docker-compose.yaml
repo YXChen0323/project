@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./app                    # 使用 app 資料夾中的 Dockerfile
+    container_name: web            # 與 nginx.conf 的 proxy_pass 對應名稱一致
+    ports:
+      - "8000:8000"              # FastAPI 對外埠
+    networks:
+      - mcp-network            # 與 PostgreSQL/Ollama 同網路
+    volumes:
+      - ./app:/app                 # 可選，方便開發時同步程式碼
+    restart: unless-stopped
+
+networks:
+  mcp-network:
+    external: true                 # 使用你現有定義的外部網路
+    driver: bridge
+    name: mcp-network
