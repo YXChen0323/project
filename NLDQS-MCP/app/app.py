@@ -1,4 +1,7 @@
 from fastapi import FastAPI, Request, UploadFile, File, Query
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 from llm_interface import query_llm
 from sql_executor import run_sql_query
 import psycopg2
@@ -7,7 +10,6 @@ import json
 import io
 import os
 import pandas as pd
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.add_middleware(
