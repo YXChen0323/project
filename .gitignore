@@ -3,3 +3,4 @@ transformer_model
 dataset
 volumes
 __pycache__
+.vscode
