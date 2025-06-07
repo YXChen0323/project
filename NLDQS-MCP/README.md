@@ -1,4 +1,3 @@
-```md
 # 🧠 自然語言資料查詢系統 (NLDQS-MCP)
 
 本系統提供使用者透過中文自然語言查詢本地資料庫，並自動轉換為 SQL 查詢語句。
@@ -77,7 +76,7 @@ http://localhost:3000
 | ------------------ | --------------------- | --------- |
 | `nginx_service`  | 前端代理 + 靜態服務 | `3000`    |
 | `web`            | FastAPI 查詢 API    | `8000`    |
-| `postgres_service` | PostgreSQL 資料庫 | `5432`    |
+| `postgres_service` | PostgreSQL 資料庫     | `5432`    |
 | `ollama_service` | LLM 模型服務         | `11434`   |
 
 ---
