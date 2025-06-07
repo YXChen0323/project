@@ -3,7 +3,15 @@ import pandas as pd
 import os
 
 def get_schema(file_path: str) -> str:
-    """根據副檔名，自動使用正確表格名稱建立 schema"""
+    """
+    Retrieves the schema information from a file based on its extension.
+
+    Args:
+        file_path (str): The path to the file.
+
+    Returns:
+        str: A string representation of the schema, or an error message if the file type is not supported.
+    """
     ext = os.path.splitext(file_path)[1].lower()
     base_name = os.path.splitext(os.path.basename(file_path))[0]
     if ext == ".db":
@@ -13,9 +21,18 @@ def get_schema(file_path: str) -> str:
     elif ext == ".xlsx":
         return get_excel_schema(file_path)
     else:
-        return "不支援的檔案格式"
+        return "Unsupported file format"
 
 def get_db_schema(db_path: str) -> str:
+    """
+    Retrieves the schema information from a SQLite database file.
+
+    Args:
+        db_path (str): The path to the SQLite database file.
+
+    Returns:
+        str: A string representation of the database schema, including table names and column details.
+    """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     tables = cursor.execute("SELECT name FROM sqlite_master WHERE type='table';").fetchall()
@@ -24,11 +41,21 @@ def get_db_schema(db_path: str) -> str:
         result.append(f"Table: {table_name}")
         columns = cursor.execute(f"PRAGMA table_info({table_name});").fetchall()
         for col in columns:
-            result.append(f"  - {col[1]} ({col[2]})")  # col[1]:欄位名, col[2]:型別
+            result.append(f"  - {col[1]} ({col[2]})")
     conn.close()
     return "\n".join(result)
 
 def get_csv_schema(csv_path: str, table_name: str = "data_from_csv") -> str:
+    """
+    Retrieves the schema information from a CSV file.
+
+    Args:
+        csv_path (str): The path to the CSV file.
+        table_name (str, optional): The name to use for the table. Defaults to "data_from_csv".
+
+    Returns:
+        str: A string representation of the CSV schema, including column names and data types.
+    """
     df = pd.read_csv(csv_path, nrows=5)
     result = [f"Table: {table_name}"]
     for col, dtype in zip(df.columns, df.dtypes):
@@ -36,6 +63,15 @@ def get_csv_schema(csv_path: str, table_name: str = "data_from_csv") -> str:
     return "\n".join(result)
 
 def get_excel_schema(excel_path: str) -> str:
+    """
+    Retrieves the schema information from an Excel file.
+
+    Args:
+        excel_path (str): The path to the Excel file.
+
+    Returns:
+        str: A string representation of the Excel schema, including sheet names, column names, and data types.
+    """
     xls = pd.ExcelFile(excel_path)
     result = []
     for sheet_name in xls.sheet_names:

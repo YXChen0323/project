@@ -1,9 +1,19 @@
-
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import re
 
 def build_prompt(user_question: str, schema: str, sample_rows: list) -> str:
+    """
+    Constructs a prompt for the language model to generate SQL queries.
+
+    Args:
+        user_question (str): The user's question in natural language.
+        schema (str): The database table schema.
+        sample_rows (list): Sample rows from the table for context.
+
+    Returns:
+        str: A formatted prompt string for the language model.
+    """
     lines = schema.strip().split("\n")
     table_name = "資料表"
     for line in lines:
@@ -46,6 +56,16 @@ def build_prompt(user_question: str, schema: str, sample_rows: list) -> str:
             """
 
 def quote_column_names(sql: str, schema: str) -> str:
+    """
+    Encloses column names in quotes within an SQL query.
+
+    Args:
+        sql (str): The SQL query string.
+        schema (str): The database table schema.
+
+    Returns:
+        str: The modified SQL query with column names enclosed in quotes.
+    """
     column_pattern = re.compile(r"- (.+?) \(")
     columns = column_pattern.findall(schema)
     for col in sorted(columns, key=len, reverse=True):
@@ -57,6 +77,16 @@ def quote_column_names(sql: str, schema: str) -> str:
     return sql
 
 def patch_split_column(sql: str, schema: str) -> str:
+    """
+    Handles cases where column names are split incorrectly.
+
+    Args:
+        sql (str): The SQL query string.
+        schema (str): The database table schema.
+
+    Returns:
+        str: The modified SQL query with patched column names.
+    """
     column_pattern = re.compile(r"- (.+?) \(")
     columns = column_pattern.findall(schema)
 
@@ -69,12 +99,24 @@ def patch_split_column(sql: str, schema: str) -> str:
             pattern_func = rf'(\b\w+\b)\s*\(\s*"{re.escape(prefix)}"\s*\(\s*{re.escape(suffix)}\s*\)\s*\)'
             sql = re.sub(pattern_func, lambda m: f'{m.group(1)}("{full_col}")', sql)
 
-            pattern_plain = rf'"{re.escape(prefix)}"\s*\(\s*{re.escape(suffix)}\s*\)'
+            pattern_plain = rf'"{re.escape(prefix)}"\s*\(\s*{re.escape(suffix)}"\s*\)'
             sql = re.sub(pattern_plain, f'"{full_col}"', sql)
 
     return sql
 
 def generate_sql(user_question: str, schema: str, sample_rows: list, model, tokenizer) -> str:
+    """Generates an SQL query based on a user question, database schema, and sample rows.
+
+    Args:
+        user_question (str): The question asked by the user in natural language.
+        schema (str): The schema of the database table, including table name and column definitions.
+        sample_rows (list): A list of sample rows from the database table, used to provide context for the language model.
+        model: The pre-trained language model used to generate the SQL query.
+        tokenizer: The tokenizer associated with the language model.
+
+    Returns:
+        str: The generated SQL query as a string, refined for compatibility with the database.
+    """
     prompt = build_prompt(user_question, schema, sample_rows)
 
     messages = [
@@ -112,6 +154,18 @@ def generate_sql(user_question: str, schema: str, sample_rows: list, model, toke
     return sql_output
 
 def summarize_result(question: str, result_df, model, tokenizer) -> str:
+    """
+    Summarizes the result of a data query using natural language.
+
+    Args:
+        question (str): The user's question.
+        result_df: The query result as a Pandas DataFrame.
+        model: The language model.
+        tokenizer: The tokenizer.
+
+    Returns:
+        str: A natural language summary of the query result.
+    """
     import re
     from langdetect import detect
 
