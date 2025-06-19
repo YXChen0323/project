@@ -4,6 +4,7 @@ from model_router import call_llm_with_prompt
 from prompt_template import build_prompt
 from database import execute_sql
 from context_store import save_query_record
+from context_store import get_recent_queries
 
 router = APIRouter()
 
@@ -11,6 +12,12 @@ class QueryRequest(BaseModel):
     user_id: str
     query: str
     model: str = "phi3"
+
+@router.get("/history/{user_id}")
+def get_history(user_id: str, limit: int = 5):
+    rows = get_recent_queries(user_id, limit)
+    return [{"question": q, "sql": sql} for q, sql, _, _ in rows]
+
 
 @router.post("/query")
 async def query_endpoint(req: QueryRequest):
