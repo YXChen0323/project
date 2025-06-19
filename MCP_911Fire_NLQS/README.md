@@ -1,1 +1,1 @@
-### GitHub : https://www.notion.so/911-MCP-20eb7bf10bf880268b7adc15bd8be62e?source=copy_link
+### Notion : https://www.notion.so/911-MCP-20eb7bf10bf880268b7adc15bd8be62e?source=copy_link

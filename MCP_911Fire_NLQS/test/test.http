@@ -1,0 +1,8 @@
+POST http://localhost:8000/query
+Content-Type: application/json
+
+{
+  "user_id": "test_user",
+  "query": "有多少案件觸發了超過 1 次警鈴？",
+  "model": "sqlcoder"
+}
