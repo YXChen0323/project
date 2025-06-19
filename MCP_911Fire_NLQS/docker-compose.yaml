@@ -1,0 +1,15 @@
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_service
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - postgres
+      - ollama
+    networks:
+      - service-network
+    restart: unless-stopped
