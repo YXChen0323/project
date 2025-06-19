@@ -1,15 +1,19 @@
-  backend:
+services:
+  backend_911:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend_service
     ports:
-      - "8000:8000"
+      - ":8000"
     volumes:
       - ./backend:/app
-    depends_on:
-      - postgres
-      - ollama
     networks:
-      - service-network
+      - 911emergency-network
     restart: unless-stopped
+
+networks:
+  911emergency-network:
+    external: true                 # 使用你現有定義的外部網路
+    driver: bridge
+    name: 911emergency-network
