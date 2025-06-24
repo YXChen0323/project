@@ -11,13 +11,11 @@ def extract_sql(text: str):
     for line in lines:
         line = line.strip()
         if line.lower().startswith("select"):
-            if "count" in line.lower() and "query_anything.emergency_calls" in line.lower():
+            if "query_anything.emergency_calls" in line.lower():
                 return line
-            elif "query_anything.emergency_calls" in line.lower():
-                return line
-    return "SELECT * FROM query_anything.emergency_calls;"  # 預設值改為列出所有記錄
+    return "[No SQL generated]"  # 改為明確的佔位符，替代預設 SQL
 
 def summarize_sql(sql: str, params=None):
     if not params:
         params = {}
-    return f"根據 '{params.get('question', 'default input')}' 查詢的結果"
+    return f"根據 '{params.get('question', 'default input')}' 查詢的結果" if sql != "[No SQL generated]" else "模型未生成有效的 SQL 查詢"
