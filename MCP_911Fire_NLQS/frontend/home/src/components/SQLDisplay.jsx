@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 export default function SQLDisplay({ initialSQL, onRunSQL }) {
   const [sql, setSQL] = useState(initialSQL || "");
 
-  // 如果外部初始 SQL 更新，內部跟著改
   useEffect(() => {
-    setSQL(initialSQL);
+    setSQL(initialSQL || "");
   }, [initialSQL]);
 
   const handleSubmit = () => {

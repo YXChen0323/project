@@ -9,35 +9,66 @@ function App() {
   const [generatedSQL, setGeneratedSQL] = useState("");
   const [answerText, setAnswerText] = useState("");
   const [dataRows, setDataRows] = useState([]);
+  const [selectedModel, setSelectedModel] = useState("sqlcoder");
 
-  const handleQuestionSubmit = (question) => {
+  const handleQuestionSubmit = async (question) => {
     setUserQuestion(question);
-    setGeneratedSQL(`SELECT * FROM locations WHERE city = '新北市';`);
-    setAnswerText(`共有 50 筆資料來自新北市。`);
-    setDataRows([]); // 清除舊資料
+    setAnswerText("查詢中...");
+    setGeneratedSQL("");
+    setDataRows([]);
+
+    try {
+      const response = await fetch("/api/rpc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "generate_sql",
+          params: { question, model: selectedModel },
+          id: "frontend-query"
+        }),
+      });
+
+      const result = await response.json();
+      console.log("收到回應：", result);
+
+      if (result?.result) {
+        const { sql, summary, data } = result.result;
+        setGeneratedSQL(sql || "無有效 SQL");
+        setAnswerText(summary || "無摘要");
+        setDataRows(data || []);
+      } else {
+        setAnswerText("查詢失敗：" + (result.error?.message || ""));
+        setGeneratedSQL("");
+        setDataRows([]);
+      }
+    } catch (error) {
+      console.error("發送查詢錯誤：", error);
+      setAnswerText("系統錯誤，請稍後再試。");
+    }
   };
 
   const handleRunSQL = (sql) => {
-    console.log("執行 SQL：", sql);
-
-    // 模擬數據
-    const mockData = [
-      { district: "板橋", count: 12 },
-      { district: "新店", count: 8 },
-      { district: "中和", count: 7 },
-      { district: "永和", count: 6 },
-      { district: "土城", count: 4 },
-    ];
-
-    setAnswerText("成功查詢，共 5 區域。");
-    setDataRows(mockData);
+    alert("尚未開放手動 SQL 執行。");
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-4">地理查詢介面</h1>
+    <div className="min-h-screen bg-gray-100 p-6 space-y-4">
+      <h1 className="text-2xl font-bold">地理查詢介面</h1>
+      <div className="mb-2">
+        <label className="mr-2 font-semibold">選擇模型：</label>
+        <select
+          value={selectedModel}
+          onChange={(e) => setSelectedModel(e.target.value)}
+          className="border px-2 py-1 rounded"
+        >
+          <option value="sqlcoder">sqlcoder</option>
+          <option value="qwen-sql">qwen-sql</option>
+          <option value="phi3-sql">phi3-sql</option>
+        </select>
+      </div>
       <QuestionInput onSubmit={handleQuestionSubmit} />
-      <SQLDisplay initialSQL={generatedSQL} onRunSQL={handleRunSQL} />
+      <SQLDisplay initialSQL={generatedSQL} onRunSQL={handleRunSQL} /> {/* 修正為 handleRunSQL */}
       <AnswerDisplay answer={answerText} />
       <DataDisplay data={dataRows} />
     </div>
