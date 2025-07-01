@@ -112,3 +112,16 @@ http://localhost:3000
 - [ ] 使用 shadcn/ui 美化元件
 
 ---
+## 🏗 MCP 客戶端
+
+`mcp_client.py` 提供與 Ollama Model Context Protocol 通訊的基本封裝，範例用法：
+
+```python
+from mcp_client import MCPClient
+
+client = MCPClient("http://localhost:11434")
+ctx = client.create_context("demo", "system instructions")
+response = client.generate(ctx["id"], "你好嗎？")
+print(response["response"])
+```
+
