@@ -153,7 +153,7 @@ async def query(request: Request):
 
 
         prompt = f"""
-        ou are a database query assistant. Please convert the user's natural language question into a PostgreSQL query statement.
+        You are a database query assistant. Please convert the user's natural language question into a PostgreSQL query statement.
 
             📌 Table: query_anything.{table_name}
 

@@ -107,7 +107,25 @@ def main():
         with st.spinner("Generating and executing query..."):
             target_file = os.path.join(UPLOAD_DIR, selected_file)
             schema = get_schema(target_file)
-            df_preview = pd.read_excel(target_file) if selected_file.endswith(".xlsx") else pd.read_csv(target_file)
+            if selected_file.endswith(".xlsx"):
+                df_preview = pd.read_excel(target_file)
+            elif selected_file.endswith(".csv"):
+                df_preview = pd.read_csv(target_file)
+            else:
+                import sqlite3
+                conn = sqlite3.connect(target_file)
+                cursor = conn.cursor()
+                first_table = cursor.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name LIMIT 1"
+                ).fetchone()
+                if first_table:
+                    df_preview = pd.read_sql_query(
+                        f'SELECT * FROM "{first_table[0]}" LIMIT 5', conn
+                    )
+                else:
+                    df_preview = pd.DataFrame()
+                conn.close()
+
             sample_rows = df_preview.head(5).to_dict(orient="records")
 
             sql_query = generate_sql(user_input, schema, sample_rows, model, tokenizer)
